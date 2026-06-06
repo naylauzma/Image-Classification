@@ -1,33 +1,67 @@
 import streamlit as st
 import tensorflow as tf
+import numpy as np
+from tensorflow.keras.preprocessing import image
 from PIL import Image
 import tempfile
 
-st.title("Klasifikasi CNN")
+st.set_page_config(page_title="Klasifikasi Hewan")
 
+st.title("Klasifikasi Gambar Hewan")
+st.write("Upload model .keras dan gambar untuk melakukan klasifikasi.")
+
+# Upload model
 model_file = st.file_uploader(
-    "Upload Model CNN (.keras)",
+    "Upload Model (.keras)",
     type=["keras"]
 )
 
+# Upload gambar
 image_file = st.file_uploader(
     "Upload Gambar",
     type=["jpg", "jpeg", "png"]
 )
 
+# Nama kelas
+class_names = ["ikan koi", "kucing"]
+
 if model_file is not None:
 
-    with tempfile.NamedTemporaryFile(delete=False, suffix=".keras") as tmp:
-        tmp.write(model_file.read())
-        model_path = tmp.name
+    with tempfile.NamedTemporaryFile(delete=False, suffix=".keras") as tmp_model:
+        tmp_model.write(model_file.read())
+        model_path = tmp_model.name
 
-    model = tf.keras.models.load_model(model_path)
+    try:
+        model = tf.keras.models.load_model(model_path)
+        st.success("Model berhasil dimuat")
 
-    st.success("Model berhasil dimuat")
+        if image_file is not None:
 
-    if image_file is not None:
-        img = Image.open(image_file)
+            img = Image.open(image_file)
+            st.image(img, caption="Gambar Input", use_container_width=True)
 
-        st.image(img, use_container_width=True)
+            # Preprocessing
+            img_resized = img.resize((227, 227))
+            img_array = image.img_to_array(img_resized)
+            img_array = np.expand_dims(img_array, axis=0)
 
-        st.write("Siap untuk prediksi")
+            # Prediksi
+            hasil = model.predict(img_array)
+
+            prediksi_idx = np.argmax(hasil)
+            prediksi_label = class_names[prediksi_idx]
+            confidence = float(np.max(hasil) * 100)
+
+            st.subheader("Hasil Klasifikasi")
+            st.success(f"Prediksi: {prediksi_label}")
+            st.info(f"Tingkat Keyakinan: {confidence:.2f}%")
+
+            st.subheader("Probabilitas Tiap Kelas")
+
+            for i, kelas in enumerate(class_names):
+                st.write(
+                    f"{kelas}: {hasil[0][i] * 100:.2f}%"
+                )
+
+    except Exception as e:
+        st.error(f"Gagal memuat model: {e}")
