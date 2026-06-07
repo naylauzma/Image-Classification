@@ -1,76 +1,67 @@
 import streamlit as st
 import tensorflow as tf
 import numpy as np
-from PIL import Image
 from tensorflow.keras.preprocessing import image
+from PIL import Image
+import tempfile
 
-st.set_page_config(
-    page_title="Klasifikasi Gambar",
-    page_icon="🐱",
-    layout="centered"
-)
+st.set_page_config(page_title="Klasifikasi Hewan")
 
-@st.cache_resource
-def load_model(model_file):
-    return tf.keras.models.load_model(model_file)
+st.title("Klasifikasi Gambar Hewan")
+st.write("Upload model .keras dan gambar untuk melakukan klasifikasi.")
 
-st.title("Klasifikasi Gambar")
-
-jenis = st.selectbox(
-    "Pilih Jenis Klasifikasi",
-    ["Ayam", "Gajah"]
-)
-
+# Upload model
 model_file = st.file_uploader(
     "Upload Model (.keras)",
     type=["keras"]
 )
 
+# Upload gambar
 image_file = st.file_uploader(
     "Upload Gambar",
     type=["jpg", "jpeg", "png"]
 )
 
-if model_file is not None and image_file is not None:
+# Nama kelas
+class_names = ["ikan koi", "kucing"]
 
-    model = load_model(model_file)
+if model_file is not None:
 
-    if jenis == "Koi":
-        class_names = ["koi", "bukan_koi"]
-    else:
-        class_names = ["kucing", "bukan_kucing"]
+    with tempfile.NamedTemporaryFile(delete=False, suffix=".keras") as tmp_model:
+        tmp_model.write(model_file.read())
+        model_path = tmp_model.name
 
-    img = Image.open(image_file).convert("RGB")
+    try:
+        model = tf.keras.models.load_model(model_path)
+        st.success("Model berhasil dimuat")
 
-    st.image(
-        img,
-        caption="Gambar yang diupload",
-        use_container_width=True
-    )
+        if image_file is not None:
 
-    if st.button("Prediksi"):
+            img = Image.open(image_file)
+            st.image(img, caption="Gambar Input", use_container_width=True)
 
-        img_resize = img.resize((224, 224))
-        img_array = image.img_to_array(img_resize)
-        img_array = np.expand_dims(img_array, axis=0)
-        img_array = img_array / 255.0
+            # Preprocessing
+            img_resized = img.resize((227, 227))
+            img_array = image.img_to_array(img_resized)
+            img_array = np.expand_dims(img_array, axis=0)
 
-        hasil = model.predict(img_array, verbose=0)
+            # Prediksi
+            hasil = model.predict(img_array)
 
-        prediksi = np.argmax(hasil)
-        probabilitas = np.max(hasil)
+            prediksi_idx = np.argmax(hasil)
+            prediksi_label = class_names[prediksi_idx]
+            confidence = float(np.max(hasil) * 100)
 
-        st.success(
-            f"Hasil Prediksi: {class_names[prediksi]}"
-        )
+            st.subheader("Hasil Klasifikasi")
+            st.success(f"Prediksi: {prediksi_label}")
+            st.info(f"Tingkat Keyakinan: {confidence:.2f}%")
 
-        st.write(
-            f"Tingkat Keyakinan: {probabilitas:.2%}"
-        )
+            st.subheader("Probabilitas Tiap Kelas")
 
-        st.subheader("Probabilitas Kelas")
+            for i, kelas in enumerate(class_names):
+                st.write(
+                    f"{kelas}: {hasil[0][i] * 100:.2f}%"
+                )
 
-        for i, nama in enumerate(class_names):
-            st.write(
-                f"{nama}: {hasil[0][i]:.4f}"
-            )
+    except Exception as e:
+        st.error(f"Gagal memuat model: {e}")
