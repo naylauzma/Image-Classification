@@ -42,12 +42,16 @@ st.markdown("""
 }
 
 /* Card Upload */
+st.markdown("""
+<style>
+
 .upload-card{
     background:white;
     padding:20px;
     border-radius:15px;
-    box-shadow:0px 4px 15px rgba(0,0,0,0.2);
-    min-height:220px;
+    border:3px solid #000000;
+    box-shadow:0px 4px 15px rgba(0,0,0,0.15);
+    margin-bottom:15px;
 }
 
 .upload-title{
@@ -55,8 +59,10 @@ st.markdown("""
     font-size:26px;
     font-weight:bold;
     color:black;
-    margin-bottom:20px;
 }
+
+</style>
+""", unsafe_allow_html=True)
 
 /* Footer */
 .footer{
