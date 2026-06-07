@@ -3,45 +3,38 @@ import tensorflow as tf
 import numpy as np
 from PIL import Image
 from tensorflow.keras.preprocessing import image
+import tempfile
 
 st.set_page_config(
-    page_title="Klasifikasi Gambar CNN",
+    page_title="Klasifikasi Gambar",
     page_icon="🖼️",
     layout="centered"
 )
 
 st.title("Klasifikasi Gambar CNN")
 
-# Upload model
+# Sesuaikan dengan model Anda
+class_names = ["koi", "kucing"]
+
 model_file = st.file_uploader(
     "Upload Model (.keras)",
     type=["keras"]
 )
 
-# Input nama kelas
-st.subheader("Nama Kelas")
-
-kelas1 = st.text_input(
-    "Nama Kelas 1",
-    placeholder="Contoh: Koi"
-)
-
-kelas2 = st.text_input(
-    "Nama Kelas 2",
-    placeholder="Contoh: Kucing"
-)
-
-# Upload gambar
 image_file = st.file_uploader(
     "Upload Gambar",
     type=["jpg", "jpeg", "png"]
 )
 
-if model_file is not None:
+@st.cache_resource
+def load_model(uploaded_model):
+    with tempfile.NamedTemporaryFile(delete=False, suffix=".keras") as tmp:
+        tmp.write(uploaded_model.read())
+        model_path = tmp.name
 
-    @st.cache_resource
-    def load_model(file):
-        return tf.keras.models.load_model(file)
+    return tf.keras.models.load_model(model_path)
+
+if model_file is not None:
 
     model = load_model(model_file)
 
@@ -51,42 +44,33 @@ if model_file is not None:
 
         st.image(
             img,
-            caption="Gambar yang Diupload",
+            caption="Gambar yang diupload",
             use_container_width=True
         )
 
         if st.button("Prediksi"):
 
-            if kelas1 == "" or kelas2 == "":
-                st.warning("Masukkan nama kedua kelas terlebih dahulu")
+            img_resize = img.resize((224, 224))
+            img_array = image.img_to_array(img_resize)
+            img_array = np.expand_dims(img_array, axis=0)
+            img_array = img_array / 255.0
 
-            else:
+            hasil = model.predict(img_array, verbose=0)
 
-                class_names = [kelas1, kelas2]
+            prediksi = np.argmax(hasil)
+            probabilitas = np.max(hasil)
 
-                # Preprocessing gambar
-                img_resize = img.resize((224, 224))
-                img_array = image.img_to_array(img_resize)
-                img_array = np.expand_dims(img_array, axis=0)
-                img_array = img_array / 255.0
+            st.success(
+                f"Hasil Prediksi: {class_names[prediksi]}"
+            )
 
-                # Prediksi
-                hasil = model.predict(img_array, verbose=0)
+            st.write(
+                f"Tingkat Keyakinan: {probabilitas:.2%}"
+            )
 
-                prediksi = np.argmax(hasil)
-                probabilitas = np.max(hasil)
+            st.subheader("Probabilitas Tiap Kelas")
 
-                st.success(
-                    f"Hasil Prediksi: {class_names[prediksi]}"
-                )
-
+            for i, nama in enumerate(class_names):
                 st.write(
-                    f"Tingkat Keyakinan: {probabilitas:.2%}"
+                    f"{nama}: {hasil[0][i]:.4f}"
                 )
-
-                st.subheader("Probabilitas Setiap Kelas")
-
-                for i, nama in enumerate(class_names):
-                    st.write(
-                        f"{nama}: {hasil[0][i]:.4f}"
-                    )
