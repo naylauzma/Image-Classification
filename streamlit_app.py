@@ -282,4 +282,3 @@ st.markdown("""
     Sistem Klasifikasi Citra Menggunakan CNN
 </div>
 """, unsafe_allow_html=True)
-```
