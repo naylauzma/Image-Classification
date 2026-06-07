@@ -96,7 +96,7 @@ header{
 # =====================================
 st.markdown("""
 <div class="navbar">
-    <h1>🧠 Sistem Klasifikasi CNN</h1>
+    <h1>🧠 Sistem Klasifikasi AYAM & GAJAH 🧠</h1>
 </div>
 """, unsafe_allow_html=True)
 
