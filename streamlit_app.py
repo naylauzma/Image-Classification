@@ -81,9 +81,13 @@ st.markdown("""
 # =====================================
 st.markdown("""
 <div class="card">
-    <h3 style='text-align:center;'>
+    <p style='text-align:center;
+              font-size:18px;
+              font-weight:500;
+              color:black;
+              margin:0;'>
         Upload model CNN (.keras) dan gambar untuk melakukan klasifikasi
-    </h3>
+    </p>
 </div>
 """, unsafe_allow_html=True)
 
