@@ -20,22 +20,9 @@ st.set_page_config(
 st.markdown("""
 <style>
 
-/* Background */
+/* Background abu tua */
 .stApp {
-    background-color: #f5f5f5;
-}
-
-/* Hilangkan menu bawaan */
-#MainMenu {
-    visibility: hidden;
-}
-
-footer {
-    visibility: hidden;
-}
-
-header {
-    visibility: hidden;
+    background-color: #3d3d3d;
 }
 
 /* Navbar */
@@ -45,7 +32,6 @@ header {
     border-radius: 15px;
     text-align: center;
     margin-bottom: 30px;
-    box-shadow: 0px 4px 15px rgba(0,0,0,0.2);
 }
 
 .navbar h1 {
@@ -55,12 +41,22 @@ header {
     font-weight: bold;
 }
 
-/* Card */
+/* Card putih */
 .card {
     background-color: white;
     padding: 25px;
     border-radius: 15px;
-    box-shadow: 0px 4px 15px rgba(0,0,0,0.1);
+    box-shadow: 0px 4px 15px rgba(0,0,0,0.2);
+}
+
+/* Semua teks dalam card hitam */
+.card h1,
+.card h2,
+.card h3,
+.card h4,
+.card p,
+.card label {
+    color: black;
 }
 
 /* Judul Upload */
@@ -68,30 +64,50 @@ header {
     text-align: center;
     font-size: 28px;
     font-weight: bold;
-    margin-bottom: 20px;
     color: black;
+    margin-bottom: 15px;
 }
 
-/* Hasil */
+/* Subheader Streamlit */
+h1, h2, h3 {
+    color: black !important;
+}
+
+/* Hasil klasifikasi */
 .result-box {
     background-color: white;
     padding: 20px;
     border-radius: 15px;
-    box-shadow: 0px 4px 15px rgba(0,0,0,0.1);
-    margin-top: 20px;
+    color: black;
 }
 
 /* Footer */
 .footer {
     text-align: center;
-    color: gray;
+    color: white;
     margin-top: 30px;
-    font-size: 14px;
+}
+
+/* Label upload file */
+[data-testid="stFileUploader"] label {
+    color: black !important;
+    font-weight: bold;
+}
+
+/* Tulisan dalam uploader */
+[data-testid="stFileUploader"] {
+    color: black !important;
+}
+
+/* Success, Info, Error */
+.stSuccess,
+.stInfo,
+.stError {
+    color: black !important;
 }
 
 </style>
 """, unsafe_allow_html=True)
-
 # =====================================
 # NAVBAR
 # =====================================
