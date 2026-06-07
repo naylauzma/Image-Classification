@@ -5,10 +5,10 @@ from tensorflow.keras.preprocessing import image
 from PIL import Image
 import tempfile
 
-st.set_page_config(page_title="Klasifikasi Ayam dan Gajah")
+st.set_page_config(page_title="Klasifikasi Hewan")
 
 st.title("Klasifikasi Gambar Hewan")
-st.write("Upload model dan gambar untuk diprediksi")
+st.write("Upload model .keras dan gambar untuk melakukan klasifikasi.")
 
 # Upload model
 model_file = st.file_uploader(
@@ -23,45 +23,38 @@ image_file = st.file_uploader(
 )
 
 # Nama kelas
-class_names = ["ayam", "gajah"]
+class_names = ["Ayam", "Gajah"]
 
 if model_file is not None:
 
-    with tempfile.NamedTemporaryFile(delete=False, suffix=".keras") as tmp:
-        tmp.write(model_file.read())
-        model_path = tmp.name
+    with tempfile.NamedTemporaryFile(delete=False, suffix=".keras") as tmp_model:
+        tmp_model.write(model_file.read())
+        model_path = tmp_model.name
 
     try:
         model = tf.keras.models.load_model(model_path)
-
         st.success("Model berhasil dimuat")
 
         if image_file is not None:
 
-            img = Image.open(image_file).convert("RGB")
+            img = Image.open(image_file)
+            st.image(img, caption="Gambar Input", use_container_width=True)
 
-            st.image(
-                img,
-                caption="Gambar yang diupload",
-                use_container_width=True
-            )
-
-            img_resize = img.resize((227, 227))
-
-            img_array = image.img_to_array(img_resize)
+            # Preprocessing
+            img_resized = img.resize((227, 227))
+            img_array = image.img_to_array(img_resized)
             img_array = np.expand_dims(img_array, axis=0)
 
+            # Prediksi
             hasil = model.predict(img_array)
 
-            prediksi = np.argmax(hasil)
-            label = class_names[prediksi]
-            confidence = np.max(hasil) * 100
+            prediksi_idx = np.argmax(hasil)
+            prediksi_label = class_names[prediksi_idx]
+            confidence = float(np.max(hasil) * 100)
 
-            st.subheader("Hasil Prediksi")
-            st.success(f"{label}")
-
-            st.subheader("Tingkat Keyakinan")
-            st.info(f"{confidence:.2f}%")
+            st.subheader("Hasil Klasifikasi")
+            st.success(f"Prediksi: {prediksi_label}")
+            st.info(f"Tingkat Keyakinan: {confidence:.2f}%")
 
             st.subheader("Probabilitas Tiap Kelas")
 
@@ -71,4 +64,4 @@ if model_file is not None:
                 )
 
     except Exception as e:
-        st.error(f"Terjadi kesalahan: {e}")
+        st.error(f"Gagal memuat model: {e}")
