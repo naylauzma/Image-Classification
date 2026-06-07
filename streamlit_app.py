@@ -9,7 +9,7 @@ import tempfile
 # KONFIGURASI HALAMAN
 # =====================================
 st.set_page_config(
-    page_title="Sistem Klasifikasi CNN",
+    page_title="Sistem Klasifikasi AYAM & GAJAH",
     page_icon="🧠",
     layout="wide"
 )
