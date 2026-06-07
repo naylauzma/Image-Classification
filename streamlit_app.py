@@ -5,7 +5,7 @@ from tensorflow.keras.preprocessing import image
 from PIL import Image
 import tempfile
 
-st.set_page_config(page_title="Klasifikasi Hewan")
+st.set_page_config(page_title="Klasifikasi Hewan AYAM & GAJAH")
 
 st.title("Klasifikasi Gambar Hewan")
 st.write("Upload model .keras dan gambar untuk melakukan klasifikasi.")
@@ -23,7 +23,7 @@ image_file = st.file_uploader(
 )
 
 # Nama kelas
-class_names = ["ikan koi", "kucing"]
+class_names = ["Ayam", "Gajah"]
 
 if model_file is not None:
 
