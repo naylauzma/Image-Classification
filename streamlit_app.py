@@ -20,90 +20,49 @@ st.set_page_config(
 st.markdown("""
 <style>
 
-/* Background abu tua */
-.stApp {
-    background-color: #3d3d3d;
+/* Background */
+.stApp{
+    background-color:#2b2b2b;
 }
 
 /* Navbar */
-.navbar {
-    background-color: #000000;
-    padding: 25px;
-    border-radius: 15px;
-    text-align: center;
-    margin-bottom: 30px;
+.navbar{
+    background:#000;
+    padding:25px;
+    border-radius:15px;
+    text-align:center;
+    margin-bottom:30px;
 }
 
-.navbar h1 {
-    color: white;
-    margin: 0;
-    font-size: 42px;
-    font-weight: bold;
+.navbar h1{
+    color:white;
+    margin:0;
+    font-size:42px;
+    font-weight:bold;
 }
 
-/* Card putih */
-.card {
-    background-color: white;
-    padding: 25px;
-    border-radius: 15px;
-    box-shadow: 0px 4px 15px rgba(0,0,0,0.2);
+/* Card Upload */
+.upload-card{
+    background:white;
+    padding:20px;
+    border-radius:15px;
+    box-shadow:0px 4px 15px rgba(0,0,0,0.2);
+    min-height:220px;
 }
 
-/* Semua teks dalam card hitam */
-.card h1,
-.card h2,
-.card h3,
-.card h4,
-.card p,
-.card label {
-    color: black;
-}
-
-/* Judul Upload */
-.upload-title {
-    text-align: center;
-    font-size: 28px;
-    font-weight: bold;
-    color: black;
-    margin-bottom: 15px;
-}
-
-/* Subheader Streamlit */
-h1, h2, h3 {
-    color: black !important;
-}
-
-/* Hasil klasifikasi */
-.result-box {
-    background-color: white;
-    padding: 20px;
-    border-radius: 15px;
-    color: black;
+.upload-title{
+    text-align:center;
+    font-size:26px;
+    font-weight:bold;
+    color:black;
+    margin-bottom:20px;
 }
 
 /* Footer */
-.footer {
-    text-align: center;
-    color: white;
-    margin-top: 30px;
-}
-
-/* Label upload file */
-[data-testid="stFileUploader"] label {
-    color: black !important;
-    font-weight: bold;
-}
-
-/* Tulisan dalam uploader */
-[data-testid="stFileUploader"] {
-    color: black !important;
-}
-
-/* Success, Info, Error */
-.stSuccess,
-.stInfo,
-.stError {
-    color: black !important;
+.footer{
+    text-align:center;
+    color:white;
+    margin-top:30px;
 }
 
 </style>
