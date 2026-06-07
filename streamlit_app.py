@@ -5,63 +5,269 @@ from tensorflow.keras.preprocessing import image
 from PIL import Image
 import tempfile
 
-st.set_page_config(page_title="Klasifikasi Hewan AYAM & GAJAH")
-
-st.title("Klasifikasi Gambar Hewan")
-st.write("Upload model .keras dan gambar untuk melakukan klasifikasi.")
-
-# Upload model
-model_file = st.file_uploader(
-    "Upload Model (.keras)",
-    type=["keras"]
+# =====================================
+# KONFIGURASI HALAMAN
+# =====================================
+st.set_page_config(
+    page_title="Sistem Klasifikasi CNN",
+    page_icon="🧠",
+    layout="wide"
 )
 
-# Upload gambar
-image_file = st.file_uploader(
-    "Upload Gambar",
-    type=["jpg", "jpeg", "png"]
-)
+# =====================================
+# CSS CUSTOM
+# =====================================
+st.markdown("""
+<style>
 
-# Nama kelas
-class_names = ["Ayam", "Gajah"]
+/* Background */
+.stApp {
+    background-color: #f5f5f5;
+}
 
+/* Hilangkan menu bawaan */
+#MainMenu {
+    visibility: hidden;
+}
+
+footer {
+    visibility: hidden;
+}
+
+header {
+    visibility: hidden;
+}
+
+/* Navbar */
+.navbar {
+    background-color: #000000;
+    padding: 25px;
+    border-radius: 15px;
+    text-align: center;
+    margin-bottom: 30px;
+    box-shadow: 0px 4px 15px rgba(0,0,0,0.2);
+}
+
+.navbar h1 {
+    color: white;
+    margin: 0;
+    font-size: 42px;
+    font-weight: bold;
+}
+
+/* Card */
+.card {
+    background-color: white;
+    padding: 25px;
+    border-radius: 15px;
+    box-shadow: 0px 4px 15px rgba(0,0,0,0.1);
+}
+
+/* Judul Upload */
+.upload-title {
+    text-align: center;
+    font-size: 28px;
+    font-weight: bold;
+    margin-bottom: 20px;
+    color: black;
+}
+
+/* Hasil */
+.result-box {
+    background-color: white;
+    padding: 20px;
+    border-radius: 15px;
+    box-shadow: 0px 4px 15px rgba(0,0,0,0.1);
+    margin-top: 20px;
+}
+
+/* Footer */
+.footer {
+    text-align: center;
+    color: gray;
+    margin-top: 30px;
+    font-size: 14px;
+}
+
+</style>
+""", unsafe_allow_html=True)
+
+# =====================================
+# NAVBAR
+# =====================================
+st.markdown("""
+<div class="navbar">
+    <h1>🧠 Sistem Klasifikasi CNN</h1>
+</div>
+""", unsafe_allow_html=True)
+
+# =====================================
+# DESKRIPSI
+# =====================================
+st.markdown("""
+<div class="card">
+    <h3 style='text-align:center;'>
+        Upload model CNN (.keras) dan gambar untuk melakukan klasifikasi
+    </h3>
+</div>
+""", unsafe_allow_html=True)
+
+st.write("")
+
+# =====================================
+# KOLOM UPLOAD
+# =====================================
+col1, col2 = st.columns(2)
+
+with col1:
+    st.markdown(
+        "<div class='upload-title'>📦 Upload Model</div>",
+        unsafe_allow_html=True
+    )
+
+    model_file = st.file_uploader(
+        "",
+        type=["keras"]
+    )
+
+with col2:
+    st.markdown(
+        "<div class='upload-title'>🖼️ Upload Gambar</div>",
+        unsafe_allow_html=True
+    )
+
+    image_file = st.file_uploader(
+        "",
+        type=["jpg", "jpeg", "png"]
+    )
+
+# =====================================
+# NAMA KELAS
+# =====================================
+class_names = [
+    "ikan koi",
+    "kucing"
+]
+
+# =====================================
+# LOAD MODEL
+# =====================================
 if model_file is not None:
 
-    with tempfile.NamedTemporaryFile(delete=False, suffix=".keras") as tmp_model:
+    with tempfile.NamedTemporaryFile(
+        delete=False,
+        suffix=".keras"
+    ) as tmp_model:
+
         tmp_model.write(model_file.read())
         model_path = tmp_model.name
 
     try:
         model = tf.keras.models.load_model(model_path)
-        st.success("Model berhasil dimuat")
 
+        st.success("✅ Model berhasil dimuat")
+
+        # =====================================
+        # PROSES GAMBAR
+        # =====================================
         if image_file is not None:
 
             img = Image.open(image_file)
-            st.image(img, caption="Gambar Input", use_container_width=True)
 
-            # Preprocessing
-            img_resized = img.resize((227, 227))
-            img_array = image.img_to_array(img_resized)
-            img_array = np.expand_dims(img_array, axis=0)
+            st.markdown("---")
 
-            # Prediksi
-            hasil = model.predict(img_array)
+            col_img, col_result = st.columns([1, 1])
 
-            prediksi_idx = np.argmax(hasil)
-            prediksi_label = class_names[prediksi_idx]
-            confidence = float(np.max(hasil) * 100)
+            # ==========================
+            # TAMPILKAN GAMBAR
+            # ==========================
+            with col_img:
+                st.subheader("📷 Gambar Input")
 
-            st.subheader("Hasil Klasifikasi")
-            st.success(f"Prediksi: {prediksi_label}")
-            st.info(f"Tingkat Keyakinan: {confidence:.2f}%")
-
-            st.subheader("Probabilitas Tiap Kelas")
-
-            for i, kelas in enumerate(class_names):
-                st.write(
-                    f"{kelas}: {hasil[0][i] * 100:.2f}%"
+                st.image(
+                    img,
+                    use_container_width=True
                 )
 
+            # ==========================
+            # PREPROCESSING
+            # ==========================
+            img_resized = img.resize((227, 227))
+
+            img_array = image.img_to_array(
+                img_resized
+            )
+
+            img_array = np.expand_dims(
+                img_array,
+                axis=0
+            )
+
+            # ==========================
+            # PREDIKSI
+            # ==========================
+            hasil = model.predict(img_array)
+
+            prediksi_idx = np.argmax(
+                hasil
+            )
+
+            prediksi_label = class_names[
+                prediksi_idx
+            ]
+
+            confidence = float(
+                np.max(hasil) * 100
+            )
+
+            # ==========================
+            # HASIL
+            # ==========================
+            with col_result:
+
+                st.subheader(
+                    "🎯 Hasil Klasifikasi"
+                )
+
+                st.success(
+                    f"Prediksi: {prediksi_label}"
+                )
+
+                st.info(
+                    f"Tingkat Keyakinan: {confidence:.2f}%"
+                )
+
+                st.subheader(
+                    "📊 Probabilitas Tiap Kelas"
+                )
+
+                for i, kelas in enumerate(
+                    class_names
+                ):
+
+                    nilai = float(
+                        hasil[0][i] * 100
+                    )
+
+                    st.progress(
+                        min(int(nilai), 100)
+                    )
+
+                    st.write(
+                        f"{kelas}: {nilai:.2f}%"
+                    )
+
     except Exception as e:
-        st.error(f"Gagal memuat model: {e}")
+
+        st.error(
+            f"❌ Gagal memuat model: {e}"
+        )
+
+# =====================================
+# FOOTER
+# =====================================
+st.markdown("""
+<div class="footer">
+    Sistem Klasifikasi Citra Menggunakan CNN
+</div>
+""", unsafe_allow_html=True)
