@@ -1,3 +1,4 @@
+```python
 import streamlit as st
 import tensorflow as tf
 import numpy as np
@@ -25,13 +26,26 @@ st.markdown("""
     background-color:#2b2b2b;
 }
 
+/* Sembunyikan menu bawaan */
+#MainMenu{
+    visibility:hidden;
+}
+
+footer{
+    visibility:hidden;
+}
+
+header{
+    visibility:hidden;
+}
+
 /* Navbar */
 .navbar{
-    background:#000;
-    padding:25px;
+    background-color:#000000;
+    padding:20px;
     border-radius:15px;
     text-align:center;
-    margin-bottom:30px;
+    margin-bottom:25px;
 }
 
 .navbar h1{
@@ -41,10 +55,15 @@ st.markdown("""
     font-weight:bold;
 }
 
-/* Card Upload */
-st.markdown("""
-<style>
+/* Deskripsi */
+.description{
+    text-align:center;
+    color:white;
+    font-size:15px;
+    margin-bottom:25px;
+}
 
+/* Card Upload */
 .upload-card{
     background:white;
     padding:20px;
@@ -54,25 +73,25 @@ st.markdown("""
     margin-bottom:15px;
 }
 
+/* Judul Upload */
 .upload-title{
     text-align:center;
-    font-size:26px;
+    font-size:24px;
     font-weight:bold;
     color:black;
 }
-
-</style>
-""", unsafe_allow_html=True)
 
 /* Footer */
 .footer{
     text-align:center;
     color:white;
     margin-top:30px;
+    font-size:14px;
 }
 
 </style>
 """, unsafe_allow_html=True)
+
 # =====================================
 # NAVBAR
 # =====================================
@@ -86,56 +105,58 @@ st.markdown("""
 # DESKRIPSI
 # =====================================
 st.markdown("""
-<div class="card">
-    <p style='text-align:center;
-              font-size:18px;
-              font-weight:500;
-              color:black;
-              margin:0;'>
-        Upload model CNN (.keras) dan gambar untuk melakukan klasifikasi
-    </p>
+<div class="description">
+    Upload model CNN (.keras) dan gambar untuk melakukan klasifikasi
 </div>
 """, unsafe_allow_html=True)
 
-st.write("")
-
 # =====================================
-# KOLOM UPLOAD
+# UPLOAD SECTION
 # =====================================
 col1, col2 = st.columns(2)
 
 with col1:
-    st.markdown(
-        "<div class='upload-title'>📦 Upload Model</div>",
-        unsafe_allow_html=True
-    )
+
+    st.markdown("""
+    <div class="upload-card">
+        <div class="upload-title">
+            📦 Upload Model
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
 
     model_file = st.file_uploader(
         "",
-        type=["keras"]
+        type=["keras"],
+        key="model"
     )
 
 with col2:
-    st.markdown(
-        "<div class='upload-title'>🖼️ Upload Gambar</div>",
-        unsafe_allow_html=True
-    )
+
+    st.markdown("""
+    <div class="upload-card">
+        <div class="upload-title">
+            🖼️ Upload Gambar
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
 
     image_file = st.file_uploader(
         "",
-        type=["jpg", "jpeg", "png"]
+        type=["jpg", "jpeg", "png"],
+        key="gambar"
     )
 
 # =====================================
 # NAMA KELAS
 # =====================================
 class_names = [
-    "ikan koi",
-    "kucing"
+    "Ayam",
+    "Gajah"
 ]
 
 # =====================================
-# LOAD MODEL
+# LOAD MODEL DAN PREDIKSI
 # =====================================
 if model_file is not None:
 
@@ -148,36 +169,42 @@ if model_file is not None:
         model_path = tmp_model.name
 
     try:
-        model = tf.keras.models.load_model(model_path)
 
-        st.success("✅ Model berhasil dimuat")
+        model = tf.keras.models.load_model(
+            model_path
+        )
 
-        # =====================================
-        # PROSES GAMBAR
-        # =====================================
+        st.success(
+            "✅ Model berhasil dimuat"
+        )
+
         if image_file is not None:
 
-            img = Image.open(image_file)
+            img = Image.open(
+                image_file
+            )
 
             st.markdown("---")
 
-            col_img, col_result = st.columns([1, 1])
+            col_img, col_result = st.columns(
+                [1, 1]
+            )
 
-            # ==========================
-            # TAMPILKAN GAMBAR
-            # ==========================
             with col_img:
-                st.subheader("📷 Gambar Input")
+
+                st.subheader(
+                    "📷 Gambar Input"
+                )
 
                 st.image(
                     img,
                     use_container_width=True
                 )
 
-            # ==========================
-            # PREPROCESSING
-            # ==========================
-            img_resized = img.resize((227, 227))
+            # Preprocessing
+            img_resized = img.resize(
+                (227, 227)
+            )
 
             img_array = image.img_to_array(
                 img_resized
@@ -188,10 +215,10 @@ if model_file is not None:
                 axis=0
             )
 
-            # ==========================
-            # PREDIKSI
-            # ==========================
-            hasil = model.predict(img_array)
+            # Prediksi
+            hasil = model.predict(
+                img_array
+            )
 
             prediksi_idx = np.argmax(
                 hasil
@@ -205,9 +232,6 @@ if model_file is not None:
                 np.max(hasil) * 100
             )
 
-            # ==========================
-            # HASIL
-            # ==========================
             with col_result:
 
                 st.subheader(
@@ -234,18 +258,21 @@ if model_file is not None:
                         hasil[0][i] * 100
                     )
 
-                    st.progress(
-                        min(int(nilai), 100)
-                    )
-
                     st.write(
                         f"{kelas}: {nilai:.2f}%"
+                    )
+
+                    st.progress(
+                        min(
+                            int(nilai),
+                            100
+                        )
                     )
 
     except Exception as e:
 
         st.error(
-            f"❌ Gagal memuat model: {e}"
+            f"Gagal memuat model: {e}"
         )
 
 # =====================================
@@ -256,3 +283,4 @@ st.markdown("""
     Sistem Klasifikasi Citra Menggunakan CNN
 </div>
 """, unsafe_allow_html=True)
+```
