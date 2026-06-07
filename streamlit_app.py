@@ -14,7 +14,7 @@ st.set_page_config(
 st.title("Klasifikasi Gambar CNN")
 
 # Sesuaikan dengan model Anda
-class_names = ["koi", "kucing"]
+class_names = ["Ayam", "Gajah"]
 
 model_file = st.file_uploader(
     "Upload Model (.keras)",
